@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Buyurtma #{{ order.pk }}{% endblock %}
+{% block content %}
+<main class="bg-sun min-h-[80vh]">
+  <div class="max-w-xl mx-auto px-5 py-12">
+    <div class="bg-white rounded-4xl p-7 shadow-xl shadow-black/10">
+      <p class="text-sm font-semibold text-black/50">Buyurtma #{{ order.pk }}</p>
+
+      {% if order.status == "canceled" %}
+        <h1 class="mt-1 text-3xl font-extrabold tracking-tight">Buyurtma bekor qilindi</h1>
+
+      {% elif order.driver %}
+        <h1 class="mt-1 text-3xl font-extrabold tracking-tight">
+          {% if order.status == "done" %}Safar yakunlandi{% else %}Haydovchi topildi{% endif %}
+        </h1>
+        <div class="mt-5 rounded-3xl bg-sun p-5">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 shrink-0 rounded-full bg-white grid place-items-center text-2xl">🚕</div>
+            <div class="min-w-0">
+              <p class="text-xl font-extrabold">{{ order.driver.name }}</p>
+              <p class="font-semibold">{{ order.driver.car_model }}</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between gap-3">
+            <span class="rounded-xl bg-white px-4 py-2 text-lg font-extrabold tracking-wider">{{ order.driver.car_plate }}</span>
+            <a href="tel:{{ order.driver.phone }}" class="rounded-xl bg-ink text-white font-extrabold px-4 py-2.5 hover:bg-black">📞 {{ order.driver.phone }}</a>
+          </div>
+        </div>
+
+      {% else %}
+        <div class="mt-1 flex items-center gap-3">
+          <span class="w-6 h-6 rounded-full border-4 border-sun border-t-ink animate-spin" aria-hidden="true"></span>
+          <h1 class="text-3xl font-extrabold tracking-tight">Haydovchi qidirilmoqda…</h1>
+        </div>
+        <p class="mt-2 text-black/60">Haydovchi topilishi bilan ismi, telefoni va mashinasi shu yerda chiqadi.</p>
+      {% endif %}
+
+      <div class="mt-6 rounded-2xl bg-mist p-4 space-y-2 font-semibold">
+        <p class="flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full bg-ink"></span>{{ order.pickup }}</p>
+        <p class="flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-sm bg-sun ring-2 ring-ink"></span>{{ order.dropoff }}</p>
+      </div>
+      <p class="mt-4 flex justify-between font-semibold">
+        <span>{{ order.tariff.name }} · {{ order.distance_km }} km</span>
+        <span class="font-extrabold">{{ order.price }} so'm</span>
+      </p>
+
+      <a href="/" class="mt-8 block text-center rounded-2xl bg-ink text-white font-extrabold py-4 hover:bg-black">Bosh sahifa</a>
+    </div>
+  </div>
+</main>
+
+{% if order.status == "new" or order.status == "assigned" %}
+<script>setTimeout(function () { location.reload(); }, 5000);</script>
+{% endif %}
+{% endblock %}

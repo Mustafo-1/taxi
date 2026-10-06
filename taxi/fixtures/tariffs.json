@@ -1,0 +1,6 @@
+[
+ {"model":"taxi.tariff","pk":1,"fields":{"name":"Ekonom","description":"Har kungi qulay safarlar","seats":4,"eta_min":3,"base_price":6000,"per_km":1800,"position":1}},
+ {"model":"taxi.tariff","pk":2,"fields":{"name":"Komfort","description":"Yangi mashina, konditsioner","seats":4,"eta_min":5,"base_price":9000,"per_km":2500,"position":2}},
+ {"model":"taxi.tariff","pk":3,"fields":{"name":"Biznes","description":"Premium sedan, jimjit salon","seats":4,"eta_min":8,"base_price":15000,"per_km":4000,"position":3}},
+ {"model":"taxi.tariff","pk":4,"fields":{"name":"Minivan","description":"6 kishigacha, yukli safar","seats":6,"eta_min":10,"base_price":14000,"per_km":3200,"position":4}}
+]

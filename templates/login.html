@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Kirish — Yo'l{% endblock %}
+{% block content %}
+<main class="bg-sun min-h-[80vh]"><div class="max-w-md mx-auto px-5 py-12">
+  <form method="post" class="bg-white rounded-4xl p-7 shadow-xl shadow-black/10 space-y-3">
+    {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+    <h1 class="text-3xl font-extrabold tracking-tight">Kirish</h1>
+    {% if form.errors %}<p role="alert" class="rounded-2xl bg-red-50 text-red-700 text-sm font-semibold px-4 py-3">Login yoki parol noto'g'ri</p>{% endif %}
+    <input name="username" required autofocus autocomplete="username" placeholder="Login" class="w-full rounded-2xl bg-mist px-4 py-3.5 outline-none font-semibold placeholder:text-black/40">
+    <input name="password" type="password" required autocomplete="current-password" placeholder="Parol" class="w-full rounded-2xl bg-mist px-4 py-3.5 outline-none font-semibold placeholder:text-black/40">
+    <button class="w-full rounded-2xl bg-ink text-white font-extrabold py-4 hover:bg-black">Kirish</button>
+    <p class="text-center text-sm text-black/60">Akkauntingiz yo'qmi? <a href="{% url 'register' %}" class="font-extrabold text-ink underline">Ro'yxatdan o'tish</a></p>
+  </form>
+</div></main>
+{% endblock %}

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Yo'l — taksi bir bosishda{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['Manrope', 'system-ui', 'sans-serif'] },
+      colors: { sun: '#FCE000', ink: '#17181A', mist: '#F3F3F1' },
+      borderRadius: { '4xl': '2rem' }
+    } } }
+  </script>
+  <style>html{scroll-behavior:smooth}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}</style>
+</head>
+<body class="bg-white text-ink font-sans antialiased">
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-black/5">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 font-extrabold text-xl">
+        <span class="grid place-items-center w-9 h-9 rounded-xl bg-sun">🚕</span> Yo'l
+      </a>
+      <nav class="hidden md:flex gap-8 text-sm font-semibold text-black/60">
+        <a href="#tariflar" class="hover:text-ink">Tariflar</a>
+        <a href="#qanday" class="hover:text-ink">Qanday ishlaydi</a>
+        <a href="#haydovchi" class="hover:text-ink">Haydovchilar</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        {% if user.is_authenticated %}
+          {% if role == "driver" %}<a href="{% url 'driver_panel' %}" class="rounded-full bg-sun text-sm font-bold px-4 py-2.5 hover:brightness-95">Haydovchi paneli</a>{% endif %}
+          <span class="hidden sm:inline text-sm font-semibold text-black/60 px-1">{{ user.first_name|default:user.username }}</span>
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="rounded-full bg-mist text-sm font-bold px-4 py-2.5 hover:bg-black/10">Chiqish</button></form>
+        {% else %}
+          <a href="{% url 'login' %}" class="rounded-full text-sm font-bold px-4 py-2.5 hover:bg-mist">Kirish</a>
+          <a href="{% url 'register' %}" class="rounded-full bg-ink text-white text-sm font-bold px-5 py-2.5 hover:bg-black">Ro'yxatdan o'tish</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+  {% block content %}{% endblock %}
+  <footer class="bg-ink text-white/70 text-sm">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col md:flex-row gap-4 justify-between">
+      <p class="font-extrabold text-white text-lg">Yo'l</p>
+      <p>© {% now "Y" %} Yo'l taksi. Barcha huquqlar himoyalangan.</p>
+    </div>
+  </footer>
+</body>
+</html>

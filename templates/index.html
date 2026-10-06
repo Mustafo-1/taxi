@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="bg-sun">
+  <div class="max-w-6xl mx-auto px-5 py-12 md:py-20 grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-[1.05] tracking-tight">Taksi — bir bosishda. Mashina 3 daqiqada yetib keladi.</h1>
+      <p class="mt-5 text-lg text-black/70 max-w-md">Manzilni kiriting, tarifni tanlang va haydovchi sizga qo'ng'iroq qiladi.</p>
+
+      {% if role == "passenger" %}
+      <form id="buyurtma" method="post" action="{% url 'order' %}" class="mt-8 bg-white rounded-4xl p-5 shadow-xl shadow-black/10 space-y-3 scroll-mt-24">
+        {% csrf_token %}
+        {% for m in messages %}
+          <div role="status" class="rounded-2xl px-4 py-3 text-sm font-semibold {% if m.tags == 'success' %}bg-emerald-50 text-emerald-800{% else %}bg-red-50 text-red-700{% endif %}">{{ m }}</div>
+        {% endfor %}
+        <div class="rounded-2xl bg-mist flex items-center gap-3 px-4">
+          <span class="w-2.5 h-2.5 rounded-full bg-ink"></span>
+          <input name="pickup" required placeholder="Qayerdan" class="w-full bg-transparent py-3.5 outline-none font-semibold placeholder:text-black/40">
+        </div>
+        <div class="rounded-2xl bg-mist flex items-center gap-3 px-4">
+          <span class="w-2.5 h-2.5 rounded-sm bg-sun ring-2 ring-ink"></span>
+          <input name="dropoff" required placeholder="Qayerga" class="w-full bg-transparent py-3.5 outline-none font-semibold placeholder:text-black/40">
+        </div>
+
+        <div class="rounded-2xl bg-mist px-4 py-3">
+          <label for="km" class="flex justify-between text-sm font-semibold"><span>Masofa</span><span><output id="km-out">5</output> km</span></label>
+          <input id="km" name="distance_km" type="range" min="1" max="50" step="0.5" value="5" class="w-full accent-black">
+        </div>
+        <fieldset class="flex gap-2 overflow-x-auto pb-1">
+          <legend class="sr-only">Tarif</legend>
+          {% for t in tariffs %}
+          <label class="shrink-0 cursor-pointer">
+            <input type="radio" name="tariff" value="{{ t.pk }}" data-base="{{ t.base_price }}" data-km="{{ t.per_km }}" class="peer sr-only" {% if forloop.first %}checked{% endif %}>
+            <span class="block rounded-2xl border-2 border-transparent bg-mist px-4 py-2.5 peer-checked:border-ink peer-checked:bg-white peer-focus-visible:outline peer-focus-visible:outline-2">
+              <span class="block font-extrabold text-sm">{{ t.name }}</span>
+              <span class="block text-xs text-black/50">{{ t.eta_min }} daq · {{ t.base_price }} so'mdan</span>
+            </span>
+          </label>
+          {% endfor %}
+        </fieldset>
+        <p class="flex justify-between items-baseline px-1"><span class="text-sm font-semibold text-black/60">Taxminiy narx</span><span class="text-2xl font-extrabold"><span id="price">—</span> so'm</span></p>
+        <button class="w-full rounded-2xl bg-ink text-white font-extrabold py-4 hover:bg-black active:scale-[.99] transition">Taksi chaqirish</button>
+      </form>
+      {% elif role == "guest" %}
+      <div id="buyurtma" class="mt-8 bg-white rounded-4xl p-6 shadow-xl shadow-black/10 scroll-mt-24">
+        <p class="text-xl font-extrabold">Taksi chaqirish uchun tizimga kiring</p>
+        <p class="mt-1 text-sm text-black/60">Buyurtmadan keyin haydovchi ismi, mashinasi va raqamini ko'rasiz.</p>
+        <div class="mt-5 flex gap-2">
+          <a href="{% url 'login' %}" class="flex-1 text-center rounded-2xl bg-mist font-extrabold py-3.5 hover:bg-black/10">Kirish</a>
+          <a href="{% url 'register' %}" class="flex-1 text-center rounded-2xl bg-ink text-white font-extrabold py-3.5 hover:bg-black">Ro'yxatdan o'tish</a>
+        </div>
+      </div>
+      {% else %}
+      <div id="buyurtma" class="mt-8 bg-white rounded-4xl p-6 shadow-xl shadow-black/10 scroll-mt-24">
+        <p class="text-xl font-extrabold">{% if role == "driver" %}Siz haydovchi sifatida kirgansiz{% else %}Buyurtma berish uchun yo'lovchi akkaunti kerak{% endif %}</p>
+        {% if role == "driver" %}<a href="{% url 'driver_panel' %}" class="mt-5 block text-center rounded-2xl bg-ink text-white font-extrabold py-3.5 hover:bg-black">Haydovchi paneliga o'tish</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Xarita illyustratsiyasi -->
+    <div class="relative hidden md:block">
+      <svg viewBox="0 0 480 520" class="w-full rounded-4xl bg-[#FFF3A0]" role="img" aria-label="Marshrut xaritasi">
+        <g stroke="#fff" stroke-width="14" fill="none" stroke-linecap="round">
+          <path d="M-10 110 H500"/><path d="M-10 300 H500"/><path d="M-10 440 H500"/>
+          <path d="M90 -10 V530"/><path d="M260 -10 V530"/><path d="M410 -10 V530"/>
+          <path d="M-10 200 L500 60" stroke-width="9"/>
+        </g>
+        <g fill="#F5E27A"><rect x="110" y="130" width="130" height="150" rx="18"/><rect x="280" y="320" width="110" height="100" rx="18"/><rect x="110" y="320" width="130" height="100" rx="18"/></g>
+        <path d="M90 440 V300 H260 V110 H410" fill="none" stroke="#17181A" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="90" cy="440" r="13" fill="#17181A"/><circle cx="90" cy="440" r="5" fill="#fff"/>
+        <rect x="397" y="97" width="26" height="26" rx="6" fill="#17181A"/><rect x="405" y="105" width="10" height="10" rx="2" fill="#FCE000"/>
+        <g transform="translate(260 205)"><circle r="20" fill="#fff" stroke="#17181A" stroke-width="4"/><text text-anchor="middle" y="7" font-size="20">🚕</text></g>
+      </svg>
+      <div class="absolute left-6 bottom-6 right-6 bg-white rounded-3xl p-4 shadow-xl flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-sun grid place-items-center text-2xl">🚕</div>
+        <div><p class="font-extrabold">Chevrolet Cobalt · 01 A 123 BC</p><p class="text-sm text-black/50">Haydovchi yo'lda — 2 daqiqa</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tariflar" class="max-w-6xl mx-auto px-5 py-20 scroll-mt-16">
+  <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Har bir safar uchun tarif</h2>
+  <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {% for t in tariffs %}
+    <article class="rounded-4xl bg-mist p-6 flex flex-col {% if forloop.counter == 2 %}ring-2 ring-ink{% endif %}">
+      <h3 class="text-xl font-extrabold">{{ t.name }}</h3>
+      <p class="mt-1 text-sm text-black/60">{{ t.description }}</p>
+      <p class="mt-6 text-3xl font-extrabold">{{ t.base_price }} <span class="text-base font-semibold">so'm</span></p>
+      <p class="text-sm text-black/50">+ {{ t.per_km }} so'm / km</p>
+      <p class="mt-auto pt-6 text-sm font-semibold">{{ t.seats }} o'rin · {{ t.eta_min }} daqiqada</p>
+    </article>
+    {% empty %}
+    <p class="text-black/60">Tariflar hali qo'shilmagan. Admin panelda tarif yarating.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="qanday" class="bg-mist scroll-mt-16">
+  <div class="max-w-6xl mx-auto px-5 py-20">
+    <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">Qanday ishlaydi</h2>
+    <ol class="mt-10 grid md:grid-cols-3 gap-4">
+      <li class="bg-white rounded-4xl p-7"><span class="grid place-items-center w-10 h-10 rounded-full bg-sun font-extrabold">1</span><h3 class="mt-5 text-xl font-extrabold">Manzilni kiriting</h3><p class="mt-2 text-black/60">Qayerdan va qayerga borishingizni yozing.</p></li>
+      <li class="bg-white rounded-4xl p-7"><span class="grid place-items-center w-10 h-10 rounded-full bg-sun font-extrabold">2</span><h3 class="mt-5 text-xl font-extrabold">Tarifni tanlang</h3><p class="mt-2 text-black/60">Narx va kutish vaqti oldindan ko'rinadi.</p></li>
+      <li class="bg-white rounded-4xl p-7"><span class="grid place-items-center w-10 h-10 rounded-full bg-sun font-extrabold">3</span><h3 class="mt-5 text-xl font-extrabold">Haydovchi keladi</h3><p class="mt-2 text-black/60">Haydovchi qo'ng'iroq qiladi va eshigingiz oldiga yetib keladi.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section id="haydovchi" class="max-w-6xl mx-auto px-5 py-20 scroll-mt-16">
+  <div class="rounded-4xl bg-sun p-8 md:p-14 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight">O'z mashinangizda daromad qiling</h2><p class="mt-3 text-black/70 max-w-lg">Qulay grafik, har kuni to'lov, past komissiya.</p></div>
+    <a href="tel:+998900000000" class="shrink-0 rounded-full bg-ink text-white font-extrabold px-8 py-4 text-center hover:bg-black">Haydovchi bo'lish</a>
+  </div>
+</section>
+<script>
+  (function () {
+    var km = document.getElementById('km'), out = document.getElementById('km-out'), price = document.getElementById('price');
+    if (!km) return;
+    function calc() {
+      var t = document.querySelector('input[name=tariff]:checked');
+      out.textContent = km.value;
+      if (!t) return;
+      var sum = Math.round((+t.dataset.base + +t.dataset.km * +km.value) / 500) * 500;
+      price.textContent = sum.toLocaleString('ru-RU');
+    }
+    km.addEventListener('input', calc);
+    document.querySelectorAll('input[name=tariff]').forEach(function (r) { r.addEventListener('change', calc); });
+    calc();
+  })();
+</script>
+{% endblock %}

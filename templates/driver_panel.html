@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Haydovchi paneli — Yo'l{% endblock %}
+{% block content %}
+{% if not active %}<meta http-equiv="refresh" content="15">{% endif %}
+<main class="bg-sun min-h-[80vh]"><div class="max-w-xl mx-auto px-5 py-12 space-y-4">
+  <section class="bg-white rounded-4xl p-6 shadow-xl shadow-black/10 flex items-center justify-between gap-4">
+    <div>
+      <p class="text-xl font-extrabold">{{ p.name }}</p>
+      <p class="text-sm font-semibold text-black/60">{{ p.car_model }}</p>
+      <p class="mt-1 inline-block rounded-lg bg-mist px-2.5 py-1 text-sm font-extrabold tracking-wide">{{ p.car_plate }}</p>
+    </div>
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="toggle">
+      <button class="rounded-full px-5 py-3 font-extrabold {% if p.is_available %}bg-emerald-100 text-emerald-800{% else %}bg-mist text-black/60{% endif %}">{% if p.is_available %}Onlayn{% else %}Oflayn{% endif %}</button>
+    </form>
+  </section>
+
+  {% if active %}
+  <section class="bg-white rounded-4xl p-6 shadow-xl shadow-black/10">
+    <h2 class="text-xl font-extrabold">Joriy safar</h2>
+    <div class="mt-4 rounded-2xl bg-mist p-4 space-y-2 font-semibold">
+      <p class="flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full bg-ink"></span>{{ active.pickup }}</p>
+      <p class="flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-sm bg-sun ring-2 ring-ink"></span>{{ active.dropoff }}</p>
+    </div>
+    <p class="mt-4 flex justify-between font-semibold"><span>{{ active.tariff.name }} · {{ active.distance_km }} km</span><span class="font-extrabold">{{ active.price }} so'm</span></p>
+    <a href="tel:{{ active.phone }}" class="mt-4 block text-center rounded-2xl bg-mist font-extrabold py-3.5 hover:bg-black/10">Yo'lovchiga qo'ng'iroq: {{ active.passenger.first_name|default:active.phone }} {{ active.phone }}</a>
+    <form method="post" class="mt-2">{% csrf_token %}<input type="hidden" name="action" value="finish">
+      <button class="w-full rounded-2xl bg-ink text-white font-extrabold py-4 hover:bg-black">Safarni yakunlash</button>
+    </form>
+  </section>
+  {% else %}
+  <section class="bg-white rounded-4xl p-6 shadow-xl shadow-black/10">
+    <h2 class="text-xl font-extrabold">Yangi buyurtmalar</h2>
+    {% for o in new_orders %}
+    <form method="post" class="mt-4 rounded-2xl bg-mist p-4 flex items-center justify-between gap-3">{% csrf_token %}
+      <input type="hidden" name="action" value="accept"><input type="hidden" name="pk" value="{{ o.pk }}">
+      <div class="font-semibold min-w-0"><p class="truncate">{{ o.pickup }} → {{ o.dropoff }}</p><p class="text-sm text-black/60">{{ o.tariff.name }} · {{ o.distance_km }} km · {{ o.price }} so'm</p></div>
+      <button class="shrink-0 rounded-xl bg-ink text-white font-extrabold px-4 py-2.5 hover:bg-black">Qabul qilish</button>
+    </form>
+    {% empty %}
+    <p class="mt-3 text-black/60">Hozircha yangi buyurtma yo'q. Sahifa o'zi yangilanadi.</p>
+    {% endfor %}
+  </section>
+  {% endif %}
+</div></main>
+{% endblock %}

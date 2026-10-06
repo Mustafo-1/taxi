@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Ro'yxatdan o'tish — Yo'l{% endblock %}
+{% block content %}
+<main class="bg-sun min-h-[80vh]"><div class="max-w-md mx-auto px-5 py-12">
+  <form method="post" class="bg-white rounded-4xl p-7 shadow-xl shadow-black/10 space-y-3">
+    {% csrf_token %}
+    <h1 class="text-3xl font-extrabold tracking-tight">Ro'yxatdan o'tish</h1>
+    {% for e in form.non_field_errors %}<p class="text-sm text-red-600 font-semibold">{{ e }}</p>{% endfor %}
+    {% for f in form %}
+      {% if f.name == "role" %}
+        <div class="grid grid-cols-2 gap-2">
+          {% for v, l in f.field.choices %}
+          <label class="cursor-pointer">
+            <input type="radio" name="role" value="{{ v }}" class="peer sr-only" {% if f.value == v %}checked{% endif %}>
+            <span class="block text-center rounded-2xl bg-mist py-3.5 font-extrabold peer-checked:bg-ink peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2">{{ l }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div {% if f.name == "car_model" or f.name == "car_plate" %}class="car-field"{% endif %}>
+          <label for="{{ f.id_for_label }}" class="sr-only">{{ f.label }}</label>
+          {{ f }}
+          {% for e in f.errors %}<p class="mt-1 px-1 text-sm text-red-600 font-semibold">{{ e }}</p>{% endfor %}
+        </div>
+      {% endif %}
+    {% endfor %}
+    <button class="w-full rounded-2xl bg-ink text-white font-extrabold py-4 hover:bg-black">Ro'yxatdan o'tish</button>
+    <p class="text-center text-sm text-black/60">Akkauntingiz bormi? <a href="{% url 'login' %}" class="font-extrabold text-ink underline">Kirish</a></p>
+  </form>
+</div></main>
+<script>
+  (function () {
+    function sync() {
+      var r = document.querySelector('input[name=role]:checked'), show = r && r.value === 'driver';
+      document.querySelectorAll('.car-field').forEach(function (e) { e.style.display = show ? '' : 'none'; });
+    }
+    document.querySelectorAll('input[name=role]').forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
+  })();
+</script>
+{% endblock %}
